@@ -1,5 +1,9 @@
+import FrontendLayout from "@/components/layouts/FrontendLayout";
+
 export default function Home() {
   return (
-    <div className=""></div>
+    <FrontendLayout>
+      <h1>Fashion</h1>
+    </FrontendLayout>
   );
 }
