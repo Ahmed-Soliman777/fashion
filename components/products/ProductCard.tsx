@@ -18,12 +18,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <Link
                 href={`/products/${product.id}`}
             >
-                <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition duration-500 group-hover:scale-105"
-                />
+                <div className="relative aspect-4/5 overflow-hidden bg-surface">
+                    <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover transition duration-500 group-hover:scale-105"
+                    />
+                </div>
             </Link>
 
             <div className="p-4">
