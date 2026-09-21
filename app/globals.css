@@ -16,4 +16,8 @@
 
   --color-accent: #2563eb;
   --color-accent-foreground: #fff;
+
+  --color-success: #22c55e;
+  --color-warning: #f59e08;
+  --color-destructive: #ef4444;
 }

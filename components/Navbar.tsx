@@ -54,7 +54,7 @@ const Navbar = () => {
                             <IoSearch size={22} />
                         </button>
                         <button
-                            onClick={() => router.push('/sign-in')}
+                            onClick={() => router.push('/signin')}
                             className="rounded-full p-2 text-foreground transition-colors hover:bg-surface">
                             <FaRegUser size={22} />
                         </button>
