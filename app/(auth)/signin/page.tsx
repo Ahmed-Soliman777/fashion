@@ -3,9 +3,12 @@
 import FrontendLayout from '@/components/layouts/FrontendLayout'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
+import { authClient } from '@/lib/auth-client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import { FcGoogle } from 'react-icons/fc'
 import z from 'zod'
 
@@ -14,11 +17,13 @@ const signInSchema = z.object({
     password: z.string().min(6, "Password must be at least 6 characters long."),
 })
 
-type SignUpFormValues = z.infer<typeof signInSchema>
+type SignInFormValues = z.infer<typeof signInSchema>
 
 const page = () => {
 
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignUpFormValues>({
+    const router = useRouter()
+
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignInFormValues>({
         resolver: zodResolver(signInSchema),
         defaultValues: {
             email: "",
@@ -26,8 +31,22 @@ const page = () => {
         }
     })
 
-    const onSubmit = async (data: SignUpFormValues) => {
-        console.log(data)
+    const onSubmit = async (data: SignInFormValues) => {
+
+        const { error } = await authClient.signIn.email({
+            email: data.email,
+            password: data.password
+        })
+
+        if (error) {
+            toast.error(error.message as string)
+            return
+        }
+
+        toast.success("Login successful")
+
+        router.replace('/account')
+
     }
 
     return (
