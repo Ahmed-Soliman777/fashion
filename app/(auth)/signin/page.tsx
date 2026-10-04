@@ -4,6 +4,7 @@ import FrontendLayout from '@/components/layouts/FrontendLayout'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { authClient } from '@/lib/auth-client'
+import { signInWithGoogle } from '@/services/signinWithGoogle'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -93,6 +94,7 @@ const page = () => {
                         </Button>
 
                         <Button
+                            onClick={signInWithGoogle}
                             leftIcon={<FcGoogle size={18} />}
                             type='button'
                             fullWidth

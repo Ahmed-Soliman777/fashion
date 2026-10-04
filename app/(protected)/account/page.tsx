@@ -1,10 +1,11 @@
 import FrontendLayout from '@/components/layouts/FrontendLayout'
 import BreadCrumb from '@/components/ui/BreadCrumb'
 import Button from '@/components/ui/Button'
+import { logout } from '@/server-actions/auth/logout'
 import Link from 'next/link'
 import React from 'react'
 import { FaUser } from 'react-icons/fa'
-import { FiMapPin, FiPackage, FiUser } from 'react-icons/fi'
+import { FiLogOut, FiMapPin, FiPackage, FiUser } from 'react-icons/fi'
 
 const page = () => {
     return (
@@ -90,6 +91,15 @@ const page = () => {
                                     My Orders
                                 </Button>
                             </Link>
+                        </div>
+                        <div className="flex justify-center mt-4">
+                            <Button
+                                onClick={logout}
+                                variant='outline'
+                                leftIcon={<FiLogOut />}
+                            >
+                                Logout
+                            </Button>
                         </div>
                     </div>
 
