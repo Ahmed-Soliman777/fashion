@@ -95,6 +95,8 @@ model Address {
   street     String
   state      String
   postalCode String?
+  city       String
+  county     String
 
   isDefault Boolean @default(false)
 
