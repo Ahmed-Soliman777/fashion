@@ -1,12 +1,40 @@
 "use client"
 
+import { Category, ProductType, Size } from "@/app/generated/prisma/enums"
 import Button from "@/components/ui/Button"
 import Input from "@/components/ui/Input"
+import { useRouter } from "next/navigation"
 import { useRef, useState } from "react"
+import { useForm } from "react-hook-form"
+import toast from "react-hot-toast"
 import { FiX } from "react-icons/fi"
 import { LuPlus } from "react-icons/lu"
 
-const availableSizes = ["S", "M", "L", "XL", "XXL"]
+const availableSizes: Size[] = [
+    Size.XS,
+    Size.S,
+    Size.M,
+    Size.L,
+    Size.XL,
+    Size.XXL,
+]
+
+const productTypes: ProductType[] = [
+    ProductType.HOODIES,
+    ProductType.JACKETS,
+    ProductType.JEANS,
+    ProductType.SHIRTS,
+    ProductType.SHOES,
+    ProductType.SHORTS,
+    ProductType.TROUSERS,
+    ProductType.T_SHIRTS,
+]
+
+const categories: Category[] = [
+    Category.MEN,
+    Category.WOMEN,
+    Category.CHILDREN,
+]
 
 const availableColors = [
     { name: "Black", value: "#000000" },
@@ -19,7 +47,30 @@ const availableColors = [
     { name: "Red", value: "#dc2626" },
 ]
 
+type ProductFormValues = {
+    name: string,
+    description: string,
+    price: number,
+    stock: number,
+    category: Category,
+    productType: ProductType
+}
+
 const page = () => {
+
+    const router = useRouter()
+
+    const { register, handleSubmit, reset, formState: { isSubmitting } } = useForm<ProductFormValues>({
+        defaultValues: {
+            name: "",
+            description: "",
+            price: 0,
+            stock: 0,
+            category: "MEN",
+            productType: "SHIRTS"
+        }
+    })
+
     const [images, setImages] = useState<File[]>([])
     const [sizes, setSizes] = useState<string[]>([])
     const [colors, setColors] = useState<string[]>([])
@@ -50,8 +101,66 @@ const page = () => {
         setColors((prev) => prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color])
     }
 
+    const handleCreateProduct = async (data: ProductFormValues) => {
+        if (images.length == 0) {
+            return toast.error("Please upload at least one image.")
+        }
+        if (sizes.length == 0) {
+            return toast.error("Please select at least one size.")
+        }
+        if (colors.length == 0) {
+            return toast.error("Please select at least one color.")
+        }
+
+        const selectedColors = availableColors.filter(color => colors.includes(color.name))
+
+        const formData = new FormData()
+
+        formData.append("name", data.name)
+        formData.append("description", data.description)
+        formData.append("price", data.price.toString())
+        formData.append("stock", data.stock.toString())
+        formData.append("productType", data.productType)
+        formData.append("category", data.category)
+        formData.append("bestSeller", String(bestSeller))
+
+        sizes.forEach(size => {
+            formData.append('sizes', size)
+        })
+
+        selectedColors.forEach(color => {
+            formData.append('colors', JSON.stringify(color))
+        })
+
+        images.forEach(image => {
+            formData.append('images', image)
+        })
+
+        try {
+            const res = await fetch('/api/products', {
+                method: 'POST',
+                body: formData
+            })
+
+            const result = await res.json()
+
+            if (!res.ok) {
+                return toast.error(result.message)
+            }
+
+            toast.success(result.message)
+
+            reset()
+
+            router.push('/admin/products')
+        } catch (error) {
+            console.error(error)
+            toast.error("Something went wrong.")
+        }
+    }
+
     return (
-        <div className="mx-auto max-w-5xl space-y-8">
+        <form onSubmit={handleSubmit(handleCreateProduct)} className="mx-auto max-w-5xl space-y-8">
             <div>
                 <h2 className="text-3xl font-semibold">Add Product</h2>
 
@@ -75,13 +184,16 @@ const page = () => {
                                             <img src={URL.createObjectURL(images[index])} alt="selectedimage" className="w-full h-full object-cover" />
 
                                             <button
+                                                type="button"
                                                 onClick={() => removeImage(index)}
                                                 className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-background shadow transition hover:bg-destructive hover:text-white">
                                                 <FiX />
                                             </button>
                                         </div>
                                     ) : (
-                                        <button onClick={() => inputRef.current?.click()} className="flex aspect-square w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-border transition hover:border-primary hover:bg-primary">
+                                        <button
+                                            type="button"
+                                            onClick={() => inputRef.current?.click()} className="flex aspect-square w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-border transition hover:border-primary hover:bg-primary">
                                             <LuPlus className="mt-3 text-sm text-muted-foreground" />
 
                                             <span className="mt-3 text-sm text-muted-foreground">
@@ -108,20 +220,25 @@ const page = () => {
                     Product Information
                 </h2>
                 <Input
+                    {...register('name')}
                     label="Product Name"
                     placeholder="Classic Black Hoodie"
                 />
                 <Input
+                    variant="textarea"
+                    {...register('description')}
                     label="Product Description"
                     placeholder="Write a detailed description...."
                 />
 
                 <div className="grid gap-5 md:grid-cols-3">
                     <Input
+                        {...register('price')}
                         label="Price"
                         placeholder="$79.99"
                     />
                     <Input
+                        {...register('stock')}
                         label="Stock Quantity"
                         placeholder="50"
                     />
@@ -133,10 +250,14 @@ const page = () => {
                             Category
                         </label>
 
-                        <select className="h-12 w-full rounded-lg border border-border bg-background px-4 outline-none transition focus:border-primary">
-                            <option>Men</option>
-                            <option>Women</option>
-                            <option>Children</option>
+                        <select
+                            {...register("category")}
+                            className="h-12 w-full rounded-lg border border-border bg-background px-4 outline-none transition focus:border-primary">
+                            {
+                                categories.map(category => (
+                                    <option key={category} value={category}>{category}</option>
+                                ))
+                            }
                         </select>
                     </div>
                     <div>
@@ -144,13 +265,14 @@ const page = () => {
                             Product Type
                         </label>
 
-                        <select className="h-12 w-full rounded-lg border border-border bg-background px-4 outline-none transition focus:border-primary">
-                            <option>T-Shirts</option>
-                            <option>Hoodies</option>
-                            <option>Jeckets</option>
-                            <option>Jeans</option>
-                            <option>Shorts</option>
-                            <option>Shoes</option>
+                        <select
+                            {...register('productType')}
+                            className="h-12 w-full rounded-lg border border-border bg-background px-4 outline-none transition focus:border-primary">
+                            {
+                                productTypes.map(productType => (
+                                    <option key={productType} value={productType}>{productType}</option>
+                                ))
+                            }
                         </select>
                     </div>
                 </div>
@@ -228,9 +350,11 @@ const page = () => {
             </section>
 
             <div className="flex justify-end">
-                <Button>Save Product</Button>
+                <Button disabled={isSubmitting}>
+                    {isSubmitting ? "Saving Product..." : "Save Product"}
+                </Button>
             </div>
-        </div>
+        </form>
     )
 }
 
