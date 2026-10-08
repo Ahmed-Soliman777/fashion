@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const description = formData.get("description") as string;
     const price = Number(formData.get("price"));
     const stock = Number(formData.get("stock"));
-    const category = formData.get("name") as Category;
+    const category = formData.get("category") as Category;
     const productType = formData.get("productType") as ProductType;
     const bestSeller = formData.get("bestSeller") === "true";
     const sizes = formData.getAll("sizes") as Size[];

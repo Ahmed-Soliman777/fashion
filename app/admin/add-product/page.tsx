@@ -102,13 +102,13 @@ const page = () => {
     }
 
     const handleCreateProduct = async (data: ProductFormValues) => {
-        if (images.length == 0) {
+        if (images.length === 0) {
             return toast.error("Please upload at least one image.")
         }
-        if (sizes.length == 0) {
+        if (sizes.length === 0) {
             return toast.error("Please select at least one size.")
         }
-        if (colors.length == 0) {
+        if (colors.length === 0) {
             return toast.error("Please select at least one color.")
         }
 
@@ -335,7 +335,7 @@ const page = () => {
             {/* product options */}
             <section className="rounded-2xl border border-border bg-background p-6">
                 <h2 className="text-lg font-semibold mb-5">
-                    Profuct Options
+                    Product Options
                 </h2>
 
                 <div className="space-y-4">

@@ -1,48 +1,15 @@
+import DeleteProductButton from "@/components/admin/DeleteProductButton"
 import Button from "@/components/ui/Button"
+import { getProducts } from "@/server-actions/product/getProduct"
 import Image from "next/image"
 import Link from "next/link"
 import { FaTrashAlt } from "react-icons/fa"
 import { FiPlus } from "react-icons/fi"
 
-const products = [
-    {
-        id: 1,
-        name: "Classic Denim Jacket",
-        category: "Jacket",
-        price: 79.99,
-        stock: 18,
-        status: "Active",
-        image: "/product1.png"
-    },
-    {
-        id: 2,
-        name: "Premium Hoodie",
-        category: "Hoodies",
-        price: 59.99,
-        stock: 8,
-        status: "Active",
-        image: "/product2.png"
-    },
-    {
-        id: 3,
-        name: "Oversized T-Shirt",
-        category: "T-Shirts",
-        price: 34.99,
-        stock: 0,
-        status: "Out of Stock",
-        image: "/product3.png"
-    },
-    {
-        id: 4,
-        name: "Leather Sneakers",
-        category: "Shoes",
-        price: 99.99,
-        stock: 25,
-        status: "Active",
-        image: "/product4.png"
-    },
-]
-const page = () => {
+export const dynamic = "force-dynamic"
+
+const page = async () => {
+    const products = await getProducts()
     return (
         <section>
             <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -54,7 +21,7 @@ const page = () => {
                     </p>
                 </div>
                 <Link
-                    href={'/add-product'}
+                    href={'/admin/add-product'}
                 >
                     <Button leftIcon={<FiPlus />}>
                         Add Product
@@ -98,7 +65,7 @@ const page = () => {
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-4">
                                                 <Image
-                                                    src={product.image}
+                                                    src={product.images[0].imageUrl}
                                                     alt={product.name}
                                                     width={60}
                                                     height={70}
@@ -127,7 +94,9 @@ const page = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <FaTrashAlt className="text-destructive"/>
+                                            <DeleteProductButton
+                                                productId={product.id}
+                                            />
                                         </td>
                                     </tr>
                                 ))
