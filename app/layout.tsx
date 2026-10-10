@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import { Toaster } from 'react-hot-toast';
 
 import "./globals.css";
+import CartHyderation from "@/providers/CartHyderation";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster />
+        <CartHyderation />
       </body>
     </html>
   );

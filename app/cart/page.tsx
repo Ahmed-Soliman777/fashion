@@ -3,41 +3,54 @@
 import FrontendLayout from "@/components/layouts/FrontendLayout"
 import BreadCrumb from "@/components/ui/BreadCrumb"
 import Button from "@/components/ui/Button"
+import { useCartStore } from "@/store/cart-store"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi"
+import { IoBagHandleOutline } from "react-icons/io5"
 
-const cartItems = [
-    {
-        id: 1,
-        name: "Classic Denim Jacket",
-        image: "/product1.png",
-        price: 79.99,
-        qunatity: 1,
-        size: "M",
-        color: "Charcoal"
-    },
-    {
-        id: 1,
-        name: "Premium Hoodie",
-        image: "/product2.png",
-        price: 59.99,
-        qunatity: 2,
-        size: "L",
-        color: "Brown"
-    },
-]
 const page = () => {
 
     const router = useRouter()
 
-    const totalItems = cartItems.reduce((sum, item) => sum + item.qunatity, 0)
-    const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.qunatity, 0)
+    const {
+        subtotal,
+        totalItems,
+        removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+        cartItems
+    } = useCartStore()
 
     const shipping = 0
-    const tax = subtotal * 0.08
-    const total = subtotal + shipping + tax
+    const tax = subtotal() * 0.08
+    const total = subtotal() + shipping + tax
+
+    if (totalItems() === 0) {
+        return (
+            <FrontendLayout>
+                <section className="mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-6 text-center">
+                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-surface">
+                        <IoBagHandleOutline size={48} className="text-muted-foreground" />
+                    </div>
+
+                    <h1 className="mt-8 text-3xl font-bold">
+                        Your cart is empty
+                    </h1>
+
+                    <p className="mt-3 max-w-md text-muted-foreground">
+                        You have not add any products to products to your cart yet. Browse our latest collection and start shopping.
+                    </p>
+
+                    <Link href={'/shop'} className="mt-8">
+                        <Button>Continue Shopping</Button>
+                    </Link>
+                </section>
+            </FrontendLayout>
+        )
+    }
+
     return (
         <FrontendLayout>
             {/* header */}
@@ -55,7 +68,7 @@ const page = () => {
                 />
 
                 <p className="mt-2 text-muted-foreground">
-                    {totalItems - 1} Item{totalItems !== 1 && "s"} in your cart.
+                    {totalItems()} Item{totalItems() !== 1 && "s"} in your cart.
                 </p>
             </div>
 
@@ -65,7 +78,7 @@ const page = () => {
                     {
                         cartItems.map((item) => (
                             <div
-                                key={item.id}
+                                key={item.cartKey}
                                 className="flex flex-col gap-5 rounded-2xl border border-border p-5 transition hover:shadow-sm sm:flex-row">
                                 {/* product image */}
                                 <div className="overflow-hidden rounded-xl">
@@ -102,20 +115,20 @@ const page = () => {
                                     <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
                                         {/* quantity */}
                                         <div className="flex items-center rounded-lg border border-border">
-                                            <button className="p-3 transition hover:bg-surface">
+                                            <button onClick={() => decreaseQuantity(item.cartKey)} className="p-3 transition hover:bg-surface">
                                                 <FiMinus />
                                             </button>
 
                                             <span className="min-w-12 text-center font-semibold">
-                                                {item.qunatity}
+                                                {item.quantity}
                                             </span>
 
-                                            <button className="p-3 transition hover:bg-surface">
+                                            <button onClick={() => increaseQuantity(item.cartKey)} className="p-3 transition hover:bg-surface">
                                                 <FiPlus />
                                             </button>
                                         </div>
 
-                                        <button className="flex items-center gap-2 text-destructive transition hover:opacity-80">
+                                        <button onClick={() => removeFromCart(item.cartKey)} className="flex items-center gap-2 text-destructive transition hover:opacity-80">
                                             <FiTrash2 />
                                             <span className="text-sm font-medium">
                                                 Remove
@@ -137,11 +150,11 @@ const page = () => {
                     <div className="mt-8 space-y-4">
                         <div className="flex justify-between">
                             <span>Items</span>
-                            <span>{totalItems - 1}</span>
+                            <span>{totalItems()}</span>
                         </div>
                         <div className="flex justify-between">
                             <span>Subtotal</span>
-                            <span>{subtotal.toFixed(2)}</span>
+                            <span>{subtotal().toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between">
                             <span>Shipping</span>

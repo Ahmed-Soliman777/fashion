@@ -5,6 +5,7 @@ import { useState } from "react"
 import { FaRegUser } from "react-icons/fa"
 import { FiMenu, FiX } from "react-icons/fi"
 import { IoBagOutline, IoSearch } from "react-icons/io5"
+import CartComponent from "./CartComponent"
 
 const navLinks = [
     { href: '/', label: 'Home' },
@@ -60,8 +61,10 @@ const Navbar = () => {
                         </button>
                         <button
                             onClick={() => router.push('/cart')}
-                            className="rounded-full p-2 text-foreground transition-colors hover:bg-surface">
+                            className="relative rounded-full p-2 text-foreground transition-colors hover:bg-surface">
                             <IoBagOutline size={23} />
+
+                            <CartComponent />
                         </button>
                     </div>
 
