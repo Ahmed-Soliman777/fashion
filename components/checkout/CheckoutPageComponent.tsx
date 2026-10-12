@@ -17,6 +17,7 @@ import { useCartStore } from "@/store/cart-store"
 import { placeOrder } from "@/server-actions/order/placeOrder"
 import { PaymentMethod } from "@/app/generated/prisma/enums"
 import toast from "react-hot-toast"
+import { createStripeCheckoutSession } from "@/server-actions/order/createStripeCheckoutSession"
 
 interface CheckoutPageComponentProps {
     user: Awaited<ReturnType<typeof getProfile>>
@@ -105,7 +106,30 @@ const CheckoutPageComponent = (
             return
         }
 
-        
+        const result = await createStripeCheckoutSession({
+            shippingAddress: {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                phone: data.phone,
+                street: data.address,
+                city: data.city,
+                state: data.state,
+                country: data.country,
+            },
+
+            cartItems: cartItems.map(item => ({
+                productId: item.productId,
+                quantity: item.quantity,
+                size: item.size,
+                color: item.color
+            }))
+        })
+
+        if (!result.url) {
+            throw new Error("Unable to start Stripe checkout.")
+        }
+
+        router.push(result.url)
     }
 
     return (
@@ -301,10 +325,6 @@ const CheckoutPageComponent = (
                                 <span>free</span>
                             </div>
                             <div className="flex justify-between">
-                                <span>Shipping</span>
-                                <span>free</span>
-                            </div>
-                            <div className="flex justify-between">
                                 <span>Tax</span>
                                 <span>${tax.toFixed(2)}</span>
                             </div>
@@ -319,6 +339,7 @@ const CheckoutPageComponent = (
                             disabled={isSubmitting}
                             fullWidth
                             className="mt-8"
+                            type="submit"
                             onClick={() => router.push('/checkout')}
                         >
                             {paymentMethod === "cod" ? "Place Order" : "Continue to Stripe"}

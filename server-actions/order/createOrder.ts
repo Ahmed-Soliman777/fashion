@@ -31,7 +31,7 @@ interface CreateOrderInput {
     color: string;
   }[];
 
-  striptSessionId?: string | null;
+  stripeSessionId?: string | null;
 }
 
 export async function createOrder(data: CreateOrderInput) {
@@ -122,7 +122,7 @@ export async function createOrder(data: CreateOrderInput) {
       data: {
         orderNumber: generateOrderNumber(),
 
-        stripeSessionId: data.striptSessionId,
+        stripeSessionId: data.stripeSessionId,
 
         subtotal,
         shipping,
