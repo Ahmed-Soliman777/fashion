@@ -1,13 +1,13 @@
 "use client"
 
 import Button from "@/components/ui/Button"
-import { getOrderByStripeSessionId } from "@/server-actions/order/getOrderBySession"
+import { getOrderByStripeSession } from "@/server-actions/order/getOrderBySession"
 import { useCartStore } from "@/store/cart-store"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { FiCheckCircle } from "react-icons/fi"
-const page = () => {
+const SuccessPage = () => {
 
     const router = useRouter()
     const searchParams = useSearchParams()
@@ -27,11 +27,11 @@ const page = () => {
         const interval = setInterval(async () => {
             attempts++
 
-            const order = await getOrderByStripeSessionId(session_id)
+            const order = await getOrderByStripeSession(session_id)
 
             if (order) {
                 clearInterval(interval)
-                toast.success(`/accout/orders/${order.orderNumber}`)
+                toast.success("Order placed successfully.")
                 clearCart()
                 router.replace(`/account/orders/${order.orderNumber}`)
                 return
@@ -96,4 +96,4 @@ const page = () => {
     )
 }
 
-export default page
+export default SuccessPage

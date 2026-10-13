@@ -45,12 +45,6 @@ const CheckoutPageComponent = (
 
     const { cartItems, clearCart, subtotal } = useCartStore()
 
-    const shipping = 0
-
-    const tax = subtotal() * 0.08
-
-    const total = subtotal() + shipping + tax
-
     const address = user?.addresses[0]
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<CheckoutFormValues>({
@@ -125,12 +119,22 @@ const CheckoutPageComponent = (
             }))
         })
 
+        if (!result.success) {
+            return toast.error(result.message as string)
+        }
+
         if (!result.url) {
             throw new Error("Unable to start Stripe checkout.")
         }
 
         router.push(result.url)
     }
+
+    const shipping = 0
+
+    const tax = subtotal() * 0.08
+
+    const total = subtotal() + shipping + tax
 
     return (
         <FrontendLayout>
@@ -342,16 +346,16 @@ const CheckoutPageComponent = (
                             type="submit"
                             onClick={() => router.push('/checkout')}
                         >
-                            {paymentMethod === "cod" ? "Place Order" : "Continue to Stripe"}
+                            {
+                                isSubmitting ? "Processing..." : paymentMethod === "stripe" ? "Continue to Stripe" : "Place Order"
+                            }
                         </Button>
 
                         <Link
                             href={'/shop'}
                             className="mt-5 block text-center text-sm font-medium text-primary hover:underline"
                         >
-                            {
-                                isSubmitting ? "Processing..." : paymentMethod === "stripe" ? "Continue to Stripe" : "Place Order"
-                            }
+                            Coutinue shopping
                         </Link>
                     </div>
                 </form>
