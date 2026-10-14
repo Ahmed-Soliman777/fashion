@@ -1,52 +1,28 @@
 import FrontendLayout from "@/components/layouts/FrontendLayout"
 import BreadCrumb from "@/components/ui/BreadCrumb"
 import Button from "@/components/ui/Button"
+import OrderStatusBadge from "@/components/ui/OrderStatusBadge"
+import { getOrder } from "@/server-actions/order/getOrder"
 import Image from "next/image"
 import Link from "next/link"
+import { notFound } from "next/navigation"
 import { FaMoneyBillWave } from "react-icons/fa"
 import { FiArrowLeft, FiMapPin, FiPackage } from "react-icons/fi"
 
-const order = {
-    id: "ord-8fk2p9",
-    createdAt: "July 27, 2026",
-    status: "pending",
-    paymentMethod: "Cash on Delivery",
-    paymentStatus: "Pending",
-    subtotal: 199.99,
-    shipping: 0,
-    tax: 10,
-    total: 209.99,
-    address: {
-        firstName: "John",
-        lastName: "Doe",
-        phone: "+234 567 8901",
-        street: "street name",
-        city: "city name",
-        country: "country"
-    },
-    items: [
-        {
-            id: "1",
-            name: "Classic Denim Jacket",
-            image: "/product1.png",
-            price: 79.99,
-            quantity: 1,
-            size: "M",
-            color: "Black",
-        },
-        {
-            id: "2",
-            name: "Premium Hoodie",
-            image: "/product2.png",
-            price: 60.00,
-            quantity: 2,
-            size: "L",
-            color: "Brown",
-        },
-    ]
+interface OrderProps {
+    params: Promise<{
+        orderId: string
+    }>
 }
 
-const page = () => {
+const page = async ({ params }: OrderProps) => {
+    const { orderId } = await params
+
+    const order = await getOrder(orderId)
+
+    if (!order) {
+        notFound()
+    }
     return (
         <FrontendLayout>
             <section className='mx-auto max-w-4xl py-12'>
@@ -65,7 +41,7 @@ const page = () => {
                             href: "/account/orders"
                         },
                         {
-                            label: order.id
+                            label: order.orderNumber
                         }
                     ]}
                 />
@@ -84,17 +60,15 @@ const page = () => {
                         </Link>
 
                         <h2 className="text-3xl font-bold">
-                            {order.id}
+                            {order.orderNumber}
                         </h2>
 
                         <p className="mt-2 text-muted-foreground">
-                            Placed on {order.createdAt}
+                            Placed on {order.createdAt.toLocaleDateString()}
                         </p>
                     </div>
 
-                    <span className="rounded-full bg-yellow-100 px-4 py-2 text-sm font-semibold text-yellow-700">
-                        Pending
-                    </span>
+                    <OrderStatusBadge status={order.status} />
                 </div>
 
                 <div className="mt-10 grid gap-10 lg:grid-cols-[2fr_1fr]">
@@ -120,7 +94,7 @@ const page = () => {
                                             className="flex flex-col gap-5 rounded-xl border border-border p-5 sm:flex-row">
                                             <Image
                                                 src={item.image}
-                                                alt={item.name}
+                                                alt={item.id}
                                                 width={130}
                                                 height={160}
                                                 className="rounded-xl object-cover"
@@ -239,7 +213,7 @@ const page = () => {
                                         Method
                                     </p>
                                     <p className="font-semibold">
-                                        {order.paymentStatus}
+                                        {order.paymentMethod}
                                     </p>
                                 </div>
                                 <div>
@@ -247,7 +221,7 @@ const page = () => {
                                         Payment Status
                                     </p>
                                     <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-700">
-                                        {order.paymentStatus}
+                                        {order.PaymentStatus}
                                     </span>
                                 </div>
                             </div>

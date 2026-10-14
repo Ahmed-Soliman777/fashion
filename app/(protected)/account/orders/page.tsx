@@ -1,29 +1,13 @@
 import FrontendLayout from '@/components/layouts/FrontendLayout'
 import BreadCrumb from '@/components/ui/BreadCrumb'
+import OrderStatusBadge from '@/components/ui/OrderStatusBadge'
+import { getOrders } from '@/server-actions/order/getOrders'
 import Image from 'next/image'
 import Link from 'next/link'
 import { FiEye } from 'react-icons/fi'
 
-const orders = [
-    {
-        id: "12345",
-        image: "/product1.png",
-        totalItems: 3,
-        totalPrice: 259.97,
-        date: "July 27, 2026",
-        status: "Delivered"
-    },
-    {
-        id: "12346",
-        image: "/product2.png",
-        totalItems: 1,
-        totalPrice: 79.97,
-        date: "July 21, 2026",
-        status: "Processing"
-    },
-]
-
-const page = () => {
+const page = async () => {
+    const orders = await getOrders()
     return (
         <FrontendLayout>
             <section className="mx-auto max-w-6xl py-12">
@@ -56,7 +40,7 @@ const page = () => {
                             >
                                 <Image
                                     src={order.image}
-                                    alt={order.id}
+                                    alt={order.orderNumber}
                                     width={110}
                                     height={130}
                                     className='rounded-xl object-cover'
@@ -65,12 +49,10 @@ const page = () => {
                                 <div className="flex-1">
                                     <div className="flex flex-wrap items-center gap-3">
                                         <h2 className="font-semibold text-lg">
-                                            Order {order.id}
+                                            Order {order.orderNumber}
                                         </h2>
 
-                                        <span className={`rounded-full px-3 py-1 text-xs font-medium bg-green-100 text-green-700`}>
-                                            Delivered
-                                        </span>
+                                        <OrderStatusBadge status={order.status} />
                                     </div>
 
                                     <div className="mt-5 grid grid-cols-2 gap-5 text-sm md:grid-cols-3">
@@ -91,7 +73,7 @@ const page = () => {
                                             </p>
                                             <p className="mt-1 font-semibold">
                                                 ${
-                                                    order.totalPrice.toFixed(2)
+                                                    order.total.toFixed(2)
                                                 }
                                             </p>
                                         </div>
@@ -102,7 +84,9 @@ const page = () => {
                                             </p>
                                             <p className="mt-1 font-semibold">
                                                 {
-                                                    order.date
+                                                    new Intl.DateTimeFormat("en-US", {
+                                                        dateStyle: "medium"
+                                                    }).format(order.createdAt)
                                                 }
                                             </p>
                                         </div>
@@ -110,7 +94,7 @@ const page = () => {
                                 </div>
 
                                 <Link
-                                    href={`/account/orders/${order.id}`}
+                                    href={`/account/orders/${order.orderNumber}`}
                                 >
                                     <button className="rounded-lg p-4 transition bg-surface cursor-pointer">
                                         <FiEye />
