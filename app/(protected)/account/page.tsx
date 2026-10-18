@@ -9,6 +9,8 @@ import React from 'react'
 import { FaUser } from 'react-icons/fa'
 import { FiLogOut, FiMapPin, FiPackage, FiUser } from 'react-icons/fi'
 
+export const dynamic = "force-dynamic"
+
 const page = async () => {
 
     const userProfile = await getProfile()

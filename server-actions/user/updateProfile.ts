@@ -40,7 +40,7 @@ export async function updateProfile(data: EditProfileFormValues) {
             street: data.street,
             city: data.city,
             state: data.state,
-            country: data.country,
+            county: data.country,
             postalCode: data.postalCode,
           },
         });

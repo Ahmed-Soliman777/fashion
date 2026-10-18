@@ -1,46 +1,10 @@
+import OrderStatusBadge from "@/components/ui/OrderStatusBadge"
+import { getAllOrders } from "@/server-actions/order/getAllOrders"
 import Link from "next/link"
 import { FiEye } from "react-icons/fi"
 
-const orders = [
-    {
-        id: "#1001",
-        customer: "John Doe",
-        total: 149.99,
-        items: 3,
-        payment: "Paid",
-        status: "Delivered",
-        date: "Jul 17, 2026"
-    },
-    {
-        id: "#1002",
-        customer: "Jane Smith",
-        total: 84.5,
-        items: 2,
-        payment: "Paid",
-        status: "Processing",
-        date: "Jul 16, 2026"
-    },
-    {
-        id: "#1003",
-        customer: "Micheal Johnson",
-        total: 219.99,
-        items: 5,
-        payment: "Pending",
-        status: "Pending",
-        date: "Jul 15, 2026"
-    },
-    {
-        id: "#1004",
-        customer: "Sarah Wilson",
-        total: 59.99,
-        items: 1,
-        payment: "Refunded",
-        status: "Cancelled",
-        date: "Jul 14, 2026"
-    },
-]
-
-const page = () => {
+const page = async () => {
+    const orders = await getAllOrders()
     return (
         <section>
             <div>
@@ -90,10 +54,10 @@ const page = () => {
                                         <td className="px-6 py-5">
                                             <div>
                                                 <p className="font-medium">
-                                                    {order.id}
+                                                    {order.orderNumber}
                                                 </p>
                                                 <p className="text-sm text-muted-foreground">
-                                                    {order.date}
+                                                    {order.createdAt.toLocaleDateString()}
                                                 </p>
                                             </div>
                                         </td>
@@ -101,28 +65,26 @@ const page = () => {
                                             {order.customer}
                                         </td>
                                         <td className="px-6 py-5">
-                                            {order.items}
+                                            {order.totalItems}
                                         </td>
                                         <td className="px-6 py-5">
                                             ${order.total.toFixed(2)}
                                         </td>
                                         <td className="px-6 py-5">
-                                            <span className={`rounded-full px-3 py-1 text-xs font-medium ${order.payment === "Paid" ? "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400" : order.payment === "Pending" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400" : "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400"}`}>
-                                                {order.payment}
+                                            <span className={`rounded-full px-3 py-1 text-xs font-medium ${order.paymentStatus === "PAID" ? "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400" : order.paymentStatus === "PENDING" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-400" : "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400"}`}>
+                                                {order.paymentStatus}
                                             </span>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <span className="rounded-full px-3 py-1 text-xs font-medium">
-                                                {order.status}
-                                            </span>
+                                            <OrderStatusBadge status={order.status} />
                                         </td>
                                         <td className="px-6 py-5">
-                                            {order.date}
+                                            {order.createdAt.toLocaleDateString()}
                                         </td>
                                         <td className="px-6 py-5">
-                                            <Link href={`/admin/orders/orderId`}>
+                                            <Link href={`/admin/orders/${order.id}`}>
                                                 <button className="rounded-lg p-4 transition hover:bg-surface">
-                                                    <FiEye/>
+                                                    <FiEye />
                                                 </button>
                                             </Link>
                                         </td>

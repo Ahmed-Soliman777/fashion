@@ -2,8 +2,8 @@ import FrontendLayout from '@/components/layouts/FrontendLayout'
 import BreadCrumb from '@/components/ui/BreadCrumb'
 import EditProfileForm from '@/components/user/EditProfileForm'
 import { getProfile } from '@/server-actions/user/getProfile'
-import React from 'react'
 
+export const dynamic = "force-dynamic"
 const page = async () => {
     const userProfile = await getProfile()
     return (

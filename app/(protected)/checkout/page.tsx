@@ -2,6 +2,8 @@ import CheckoutPageComponent from '@/components/checkout/page'
 import { getProfile } from '@/server-actions/user/getProfile'
 import { redirect } from 'next/navigation'
 
+export const dynamic = "force-dynamic"
+
 const page = async () => {
 
   const user = await getProfile()
@@ -11,7 +13,7 @@ const page = async () => {
   }
 
   return (
-    <CheckoutPageComponent user={user} />
+    <CheckoutPageComponent />
   )
 }
 

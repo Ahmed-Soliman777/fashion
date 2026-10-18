@@ -1,32 +1,33 @@
-import Button from "@/components/ui/Button"
+import OrderStatusCard from "@/components/order/OrderStatusCard"
+import { getAdminOrders } from "@/server-actions/order/getAdminOrders"
 import Image from "next/image"
+import { notFound } from "next/navigation"
 
-const products = [
-    {
-        id: 1,
-        name: "Classic Denim Jacket",
-        size: "L",
-        qunatity: 2,
-        price: 79.99,
-        image: "/product1.png"
-    },
-    {
-        id: 2,
-        name: "Premium Hoodie",
-        size: "M",
-        qunatity: 1,
-        price: 59.99,
-        image: "/product2.png"
-    },
-]
-const page = () => {
+interface OrderDetailsPageProps {
+    params: Promise<{
+        orderId: string
+    }>
+}
+
+const page = async ({ params }: OrderDetailsPageProps) => {
+
+    const { orderId } = await params
+
+    const order = await getAdminOrders(Number(orderId))
+
+    if (!order) {
+        notFound()
+    }
+
     return (
         <section>
             <div>
-                <h2 className="text-3xl font-semibold">Order #515151</h2>
+                <h2 className="text-3xl font-semibold">Order #{order.orderNumber}</h2>
 
                 <p className="mt-2 text-muted-foreground">
-                    Placed on July 17, 2026
+                    Placed on {new Intl.DateTimeFormat("en-US", {
+                        dateStyle: "long"
+                    }).format(order.createdAt)}
                 </p>
             </div>
 
@@ -43,7 +44,7 @@ const page = () => {
                                     Name
                                 </p>
                                 <p className="mt-1 font-medium">
-                                    Jane Doe
+                                    {order.customer.name}
                                 </p>
                             </div>
                             <div>
@@ -51,7 +52,7 @@ const page = () => {
                                     Email
                                 </p>
                                 <p className="mt-1 font-medium">
-                                    Jane@mail.com
+                                    {order.customer.email}
                                 </p>
                             </div>
                             <div>
@@ -59,7 +60,7 @@ const page = () => {
                                     Phone
                                 </p>
                                 <p className="mt-1 font-medium">
-                                    +15151515151
+                                    {order.customer.phone}
                                 </p>
                             </div>
                             <div>
@@ -67,7 +68,11 @@ const page = () => {
                                     Address
                                 </p>
                                 <p className="mt-1 font-medium">
-                                    25 Main Street, <br /> USA
+                                    {order.address.street}
+                                    <br />
+                                    {order.address.city}, {order.address.state}
+                                    <br />
+                                    {order.address.country}
                                 </p>
                             </div>
                         </div>
@@ -83,14 +88,14 @@ const page = () => {
 
                         <div className="divide-y divide-border">
                             {
-                                products.map(product => (
+                                order.items.map(product => (
 
                                     <div
                                         key={product.id}
                                         className="flex items-center gap-5 p-6">
                                         <Image
                                             src={product.image}
-                                            alt={product.name}
+                                            alt={product?.name || ""}
                                             width={80}
                                             height={90}
                                             className="rounded-lg object-cover"
@@ -106,12 +111,12 @@ const page = () => {
                                             </p>
 
                                             <p className="mt-1 text-sm text-muted-foreground">
-                                                Quantity: {product.qunatity}
+                                                Quantity: {product.quantity}
                                             </p>
                                         </div>
 
                                         <div className="font-semibold">
-                                            ${(product.price * product.qunatity).toFixed(2)}
+                                            ${(product.price * product.quantity).toFixed(2)}
                                         </div>
                                     </div>
                                 ))
@@ -123,24 +128,10 @@ const page = () => {
                 {/* right side */}
                 <div className="space-y-8">
                     {/* status */}
-                    <div className="rounded-2xl border border-border bg-background p-6">
-                        <h2 className="text-lg font-semibold">Customer Order Status</h2>
-
-                        <div className="mt-6">
-                            <label className="mb-2 block text-sm font-medium">Status</label>
-                            <select className="h-12 w-full rounded-lg border border-border bg-background px-4 outline-none focus:border-primary">
-                                <option>Pending</option>
-                                <option>Processing</option>
-                                <option>Shipping</option>
-                                <option>Delivered</option>
-                                <option>Cancelled</option>
-                            </select>
-                        </div>
-
-                        <Button className="mt-6 w-full">
-                            Update Order
-                        </Button>
-                    </div>
+                    <OrderStatusCard
+                        orderId={order.id}
+                        status={order.status}
+                    />
 
                     {/* summary */}
                     <div className="rounded-2xl border border-border bg-background p-6">
@@ -151,26 +142,26 @@ const page = () => {
                                 <span className="text-muted-foreground">
                                     Subtotal
                                 </span>
-                                <span>$555</span>
+                                <span>${order.subtotal.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">
                                     Shipping
                                 </span>
-                                <span>$555</span>
+                                <span>${order.shipping.toFixed(2)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">
                                     Tax
                                 </span>
-                                <span>$555</span>
+                                <span>${order.tax.toFixed(2)}</span>
                             </div>
 
                             <div className="border-t border-border pt-4 flex justify-between text-lg font-semibold">
                                 <span className="text-muted-foreground">
                                     Total
                                 </span>
-                                <span>$5000</span>
+                                <span>${order.total.toFixed(2)}</span>
                             </div>
                         </div>
                     </div>
@@ -184,7 +175,7 @@ const page = () => {
                                 Method
                             </span>
                             <span>
-                                Stripe
+                                {order.paymentMethod}
                             </span>
                         </div>
 
@@ -193,7 +184,7 @@ const page = () => {
                                 Status
                             </span>
                             <span>
-                                Paid
+                                {order.paymentStatus}
                             </span>
                         </div>
                     </div>

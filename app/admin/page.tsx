@@ -1,23 +1,26 @@
+import { getDashboardStatus } from '@/server-actions/admin/getDashboardStatus'
 import { FiPackage, FiShoppingBag, FiUser } from 'react-icons/fi'
 
-const stats = [
-    {
-        title: "Total Users",
-        value: "1,245",
-        icon: FiUser
-    },
-    {
-        title: "Total Products",
-        value: "156",
-        icon: FiPackage
-    },
-    {
-        title: "Total Ord ers",
-        value: "428",
-        icon: FiShoppingBag
-    },
-]
-const page = () => {
+const page = async () => {
+    const { totalOrders, totalProducts, totalUsers } = await getDashboardStatus()
+
+    const stats = [
+        {
+            title: "Total Users",
+            value: totalUsers,
+            icon: FiUser
+        },
+        {
+            title: "Total Products",
+            value: totalProducts,
+            icon: FiPackage
+        },
+        {
+            title: "Total Ord ers",
+            value: totalOrders,
+            icon: FiShoppingBag
+        },
+    ]
     return (
         <section>
             <div>
