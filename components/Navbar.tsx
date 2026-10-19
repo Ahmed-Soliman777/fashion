@@ -4,8 +4,9 @@ import { usePathname, useRouter } from "next/navigation"
 import { useState } from "react"
 import { FaRegUser } from "react-icons/fa"
 import { FiMenu, FiX } from "react-icons/fi"
-import { IoBagOutline, IoSearch } from "react-icons/io5"
+import { IoBagOutline } from "react-icons/io5"
 import CartComponent from "./CartComponent"
+import { logout } from "@/server-actions/auth/logout"
 
 const navLinks = [
     { href: '/', label: 'Home' },
@@ -51,9 +52,6 @@ const Navbar = () => {
 
                 <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2">
-                        <button className="rounded-full p-2 text-foreground transition-colors hover:bg-surface">
-                            <IoSearch size={22} />
-                        </button>
                         <button
                             onClick={() => router.push('/signin')}
                             className="rounded-full p-2 text-foreground transition-colors hover:bg-surface">
@@ -96,9 +94,9 @@ const Navbar = () => {
                                 ))
                             }
                             <button
-                                onClick={() => router.push('/sign-in')}
+                                onClick={logout}
                                 className="mt-4 rounded-lg bg-primary py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary-hover">
-                                Sign In
+                                Sign Out
                             </button>
                         </div>
                     </div>
